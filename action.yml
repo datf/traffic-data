@@ -1,0 +1,31 @@
+name: 'GitHub Traffic Tracker'
+description: 'Fetches and archives traffic stats for public repositories into CSV files.'
+author: '@datf'
+
+inputs:
+  github_token:
+    description: 'A Personal Access Token for all repositories with Administration (Read-only) access'
+    required: true
+  data_path:
+    description: 'Relative path under $GITHUB_WORKSPACE to save CSVs'
+    default: data
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+
+    - name: Run Traffic Script
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: python ${{ github.action_path }}/traffic.py -d "${{ inputs.data_path }}"
